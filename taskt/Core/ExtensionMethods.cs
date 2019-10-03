@@ -210,9 +210,6 @@ namespace taskt.Core
 
             }
 
-
-
-
             //track math chars
             var mathChars = new List<Char>();
             mathChars.Add('*');
@@ -220,6 +217,7 @@ namespace taskt.Core
             mathChars.Add('-');
             mathChars.Add('=');
             mathChars.Add('/');
+            mathChars.Add('\'');
 
             //if the string matches the char then return
             //as the user does not want to do math
