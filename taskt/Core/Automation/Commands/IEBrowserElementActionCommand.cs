@@ -34,12 +34,19 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Left Click")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Middle Click")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Right Click")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Double Left Click")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Get Text")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Set Text")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Get Attribute")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Set Attribute")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onmousedown event")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onmouseover event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onkeydown event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onkeyup event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire ondblclick event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onpaste event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onselect event")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onblur event")]
         [Attributes.PropertyAttributes.InputSpecification("Select the appropriate corresponding action to take once the element has been located")]
         [Attributes.PropertyAttributes.SampleUsage("Select from **Invoke Click**, **Set Text**, **Get Text**, **Get Attribute**")]
         [Attributes.PropertyAttributes.Remarks("Selecting this field changes the parameters that will be required in the next step")]
@@ -214,11 +221,13 @@ namespace taskt.Core.Automation.Commands
                 string searchPropertyName = seachCriteria.Field<string>("Property Name");
                 string searchPropertyValue = seachCriteria.Field<string>("Property Value");
                 string searchPropertyFound = seachCriteria.Field<string>("Match Found");
+                searchPropertyFound = "False";
 
                 string innerHTML = element.innerHTML;
+                string innertext = element.innerText;
                 string outerHTML = element.outerHTML;
 
-                searchPropertyFound = "False";
+
 
                 try
                 {
@@ -235,6 +244,20 @@ namespace taskt.Core.Automation.Commands
                             HTMLAnchorElement anchor = (HTMLAnchorElement)element;
                             if (anchor.href.Contains(searchPropertyValue))
                             {
+                                seachCriteria.SetField<string>("Match Found", "True");
+                            }
+                            else
+                            {
+                                seachCriteria.SetField<string>("Match Found", "False");
+                            }
+                        }
+                        catch (Exception ex) { }
+                    }
+                    else if (searchPropertyName.ToLower() == "style")
+                    {
+                        try
+                        {
+                            if (element.style.cssText == searchPropertyValue) {
                                 seachCriteria.SetField<string>("Match Found", "True");
                             }
                             else
@@ -262,8 +285,8 @@ namespace taskt.Core.Automation.Commands
                         }
                         else
                         {
-                            //string elementValue = (string)element.GetType().GetProperty(searchPropertyName).GetValue(element, null);
-                            string elementValue = (string)element.getAttribute(searchPropertyName);
+                            string elementValue = (string)element.GetType().GetProperty(searchPropertyName).GetValue(element, null);
+                            //string elementValue = (string)element.getAttribute(searchPropertyName);
                             if ((elementValue != null) && (elementValue == searchPropertyValue))
                             {
                                 seachCriteria.SetField<string>("Match Found", "True");
@@ -296,12 +319,36 @@ namespace taskt.Core.Automation.Commands
             {
                 ((IHTMLElement3)element).FireEvent("onmouseover");
             }
+            else if (v_WebAction == "Fire onkeydown event")
+            {
+                ((IHTMLElement3)element).FireEvent("onkeydown");
+            }
+            else if (v_WebAction == "Fire onkeyup event")
+            {
+                ((IHTMLElement3)element).FireEvent("onkeyup");
+            }
+            else if (v_WebAction == "Fire ondblclick event")
+            {
+                ((IHTMLElement3)element).FireEvent("ondblclick");
+            }
+            else if (v_WebAction == "Fire onpaste event")
+            {
+                ((IHTMLElement3)element).FireEvent("onpaste");
+            }
+            else if (v_WebAction == "Fire onselect event")
+            {
+                ((IHTMLElement3)element).FireEvent("onselect");
+            }
+            else if (v_WebAction == "Fire onblur event")
+            {
+                ((IHTMLElement3)element).FireEvent("onblur");
+            }
             else if (v_WebAction == "Invoke Click")
             {
                 element.click();
                 IEBrowserCreateCommand.WaitForReadyState(browserInstance);
             }
-            else if ((v_WebAction == "Left Click") || (v_WebAction == "Middle Click") || (v_WebAction == "Right Click"))
+            else if ((v_WebAction == "Left Click") || (v_WebAction == "Middle Click") || (v_WebAction == "Right Click") || (v_WebAction == "Double Left Click"))
             {
                 int elementXposition = FindElementXPosition(element);
                 int elementYposition = FindElementYPosition(element);
@@ -443,6 +490,12 @@ namespace taskt.Core.Automation.Commands
                 case "Invoke Click":
                 case "Fire onmousedown event":
                 case "Fire onmouseover event":
+                case "Fire onkeydown event":
+                case "Fire onkeyup event":
+                case "Fire ondblclick event":
+                case "Fire onpaste event":
+                case "Fire onselect event":
+                case "Fire onblur event":
                 case "Clear Element":
 
                     foreach (var ctrl in ElementParameterControls)
