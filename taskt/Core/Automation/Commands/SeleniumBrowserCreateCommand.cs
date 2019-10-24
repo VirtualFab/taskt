@@ -41,7 +41,7 @@ namespace taskt.Core.Automation.Commands
         public string v_BrowserWindowOption { get; set; }
 
         [XmlAttribute]
-        [Attributes.PropertyAttributes.PropertyDescription("Please specify Selenium command line options (optional)")]
+        [Attributes.PropertyAttributes.PropertyDescription("Please specify Selenium command line options (optional) - for IE InitialBrowserUrl")]
         [Attributes.PropertyAttributes.InputSpecification("Select optional options to be passed to the Selenium command.")]
         [Attributes.PropertyAttributes.SampleUsage("user-data-dir=c:\\users\\public\\SeleniumTasktProfile")]
         [Attributes.PropertyAttributes.Remarks("")]
@@ -91,8 +91,27 @@ namespace taskt.Core.Automation.Commands
             }
             else
             {
+                OpenQA.Selenium.IE.InternetExplorerOptions options = new OpenQA.Selenium.IE.InternetExplorerOptions();
+
+                if (!string.IsNullOrEmpty(v_SeleniumOptions))
+                {
+                    var convertedOptions = v_SeleniumOptions.ConvertToUserVariable(sender);
+                    options.InitialBrowserUrl = convertedOptions;                 
+                }
+
+                options.IgnoreZoomLevel = true;
+                options.IntroduceInstabilityByIgnoringProtectedModeSettings = true;
+                //options.EnableNativeEvents = false;
+                //options.UnhandledPromptBehavior = OpenQA.Selenium.UnhandledPromptBehavior.Accept;
+                //options.EnablePersistentHover = true;
+                //options.EnsureCleanSession = true;
+                //options.RequireWindowFocus = true;
+
+                //options.ForceCreateProcessApi = true;
+                //options.AcceptInsecureCertificates = false;
+
                 driverService = OpenQA.Selenium.IE.InternetExplorerDriverService.CreateDefaultService(driverPath);
-                webDriver = new OpenQA.Selenium.IE.InternetExplorerDriver((OpenQA.Selenium.IE.InternetExplorerDriverService)driverService, new OpenQA.Selenium.IE.InternetExplorerOptions());
+                webDriver = new OpenQA.Selenium.IE.InternetExplorerDriver((OpenQA.Selenium.IE.InternetExplorerDriverService)driverService, options);
             }
 
 
