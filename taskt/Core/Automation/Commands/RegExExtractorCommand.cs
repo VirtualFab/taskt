@@ -73,21 +73,10 @@ namespace taskt.Core.Automation.Commands
                 matchGroup = 0;
             }
 
-            if (!match.Success)
-            {
-                //throw exception if no match found
-                throw new Exception("RegEx Match was not found! Input: " + variableInput + ", Pattern: " + variableExtractorPattern);
-            }
-            else
-            {
-                //store string in variable
-                string matchedValue = match.Groups[matchGroup].Value;
-                matchedValue.StoreInUserVariable(sender, v_applyToVariableName);
-            }
-
-
-
+            string matchedValue = match.Groups[matchGroup].Value;
+            matchedValue.StoreInUserVariable(sender, v_applyToVariableName);
         }
+
         public override List<Control> Render(frmCommandEditor editor)
         {
             base.Render(editor);
