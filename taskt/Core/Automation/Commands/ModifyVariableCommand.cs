@@ -30,6 +30,7 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.PropertyUISelectionOption("To Lower Case")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("To Base64 String")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("From Base64 String")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Trim")]
         public string v_ConvertType { get; set; }
 
         [XmlAttribute]
@@ -61,6 +62,9 @@ namespace taskt.Core.Automation.Commands
                     break;
                 case "To Lower Case":
                     stringValue = stringValue.ToLower();
+                    break;
+                case "Trim":
+                    stringValue = stringValue.Trim();
                     break;
                 case "To Base64 String":
                     byte[] textAsBytes = System.Text.Encoding.ASCII.GetBytes(stringValue);
