@@ -56,7 +56,23 @@ namespace taskt
                     return;
                 }
 
-                Application.Run(new UI.Forms.frmScriptEngine(filePath, null, null, true));
+                List<Core.Script.ScriptVariable> scriptVariables = null;
+                if (args.Length > 1)
+                {
+                    scriptVariables = new List<Core.Script.ScriptVariable>();
+                    for (int i = 1; i < args.Length; i++)
+                    {
+                        if (args[i].Contains('='))
+                        {
+                            Core.Script.ScriptVariable v = new Core.Script.ScriptVariable();
+                            v.VariableName = args[i].Split('=')[0];
+                            v.VariableValue = args[i].Split('=')[1];
+                            scriptVariables.Add(v);
+                        }
+                    }
+                }
+
+                Application.Run(new UI.Forms.frmScriptEngine(filePath, null, scriptVariables, true));
             }
             else
             {
