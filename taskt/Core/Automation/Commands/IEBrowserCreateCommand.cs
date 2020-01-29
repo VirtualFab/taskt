@@ -43,28 +43,28 @@ namespace taskt.Core.Automation.Commands
 
         public override void RunCommand(object sender)
         {
-            //var engine = (Core.Automation.Engine.AutomationEngineInstance)sender;
+            var engine = (Core.Automation.Engine.AutomationEngineInstance)sender;
 
-            //var instanceName = v_InstanceName.ConvertToUserVariable(sender);
+            var instanceName = v_InstanceName.ConvertToUserVariable(sender);
 
-            //SHDocVw.InternetExplorer newBrowserSession = new SHDocVw.InternetExplorer();
-            //try
-            //{
-            //    newBrowserSession.Navigate(v_URL.ConvertToUserVariable(sender));
-            //    WaitForReadyState(newBrowserSession);
-            //    newBrowserSession.Visible = true;
-            //}
-            //catch (Exception ex) { }
+            SHDocVw.InternetExplorer newBrowserSession = new SHDocVw.InternetExplorer();
+            try
+            {
+                newBrowserSession.Navigate(v_URL.ConvertToUserVariable(sender));
+                WaitForReadyState(newBrowserSession);
+                newBrowserSession.Visible = true;
+            }
+            catch (Exception ex) { }
 
-            ////add app instance
-            //engine.AddAppInstance(instanceName, newBrowserSession);
+            //add app instance
+            engine.AddAppInstance(instanceName, newBrowserSession);
 
-            ////handle app instance tracking
-            //if (v_InstanceTracking == "Keep Instance Alive")
-            //{
-            //    GlobalAppInstances.AddInstance(instanceName, newBrowserSession);
-            //}
-            Process.Start("IExplore.exe", v_URL.ConvertToUserVariable(sender));
+            //handle app instance tracking
+            if (v_InstanceTracking == "Keep Instance Alive")
+            {
+                GlobalAppInstances.AddInstance(instanceName, newBrowserSession);
+            }
+            //Process.Start("IExplore.exe", v_URL.ConvertToUserVariable(sender));
         }
 
         public static void WaitForReadyState(SHDocVw.InternetExplorer ieInstance)
@@ -95,7 +95,7 @@ namespace taskt.Core.Automation.Commands
 
         public override string GetDisplayValue()
         {
-            return base.GetDisplayValue() + " [Instance Name: '" + v_InstanceName + "']";
+            return base.GetDisplayValue() + " [Instance Name: '" + v_InstanceName + "' - URL: '" + v_URL + "']";
         }
     }
 
