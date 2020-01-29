@@ -39,6 +39,7 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Set Text")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Get Attribute")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Set Attribute")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire custom event")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onmousedown event")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onmouseover event")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Fire onkeydown event")]
@@ -287,7 +288,8 @@ namespace taskt.Core.Automation.Commands
                         {
                             string elementValue = (string)element.GetType().GetProperty(searchPropertyName).GetValue(element, null);
                             //string elementValue = (string)element.getAttribute(searchPropertyName);
-                            if ((elementValue != null) && (elementValue == searchPropertyValue))
+
+                            if ((elementValue != null) && (searchPropertyValue.EndsWith("*%*") ? elementValue.Contains(searchPropertyValue.Substring(0,searchPropertyValue.Length - 3)) : elementValue == searchPropertyValue ))
                             {
                                 seachCriteria.SetField<string>("Match Found", "True");
                             }
@@ -342,6 +344,13 @@ namespace taskt.Core.Automation.Commands
             else if (v_WebAction == "Fire onblur event")
             {
                 ((IHTMLElement3)element).FireEvent("onblur");
+            }
+            else if (v_WebAction == "Fire custom event")
+            {
+                string customEvent = (from rw in v_WebActionParameterTable.AsEnumerable()
+                                        where rw.Field<string>("Parameter Name") == "Event Name"
+                                        select rw.Field<string>("Parameter Value")).FirstOrDefault();
+                ((IHTMLElement3)element).FireEvent(customEvent);
             }
             else if (v_WebAction == "Invoke Click")
             {
@@ -565,6 +574,17 @@ namespace taskt.Core.Automation.Commands
                         actionParameters.Rows.Add("Value To Set");
                     }
 
+                    break;
+
+                case "Fire custom event":
+                    foreach (var ctrl in ElementParameterControls)
+                    {
+                        ctrl.Show();
+                    }
+                    if (sender != null)
+                    {
+                        actionParameters.Rows.Add("Event Name");
+                    }
                     break;
 
                 default:
