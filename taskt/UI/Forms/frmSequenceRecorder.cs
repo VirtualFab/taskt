@@ -181,10 +181,12 @@ namespace taskt.UI.Forms
 
 
                 int.TryParse(txtHookResolution.Text, out int samplingResolution);
+                int.TryParse(txtHookTolerance.Text, out int samplingTolerance);
+                
 
 
                 GlobalHook.HookStopped += new EventHandler(OnHookStopped);
-                GlobalHook.StartScreenRecordingHook(chkCaptureClicks.Checked, chkCaptureMouse.Checked, chkGroupMovesIntoSequences.Checked, chkCaptureKeyboard.Checked, chkCaptureWindowEvents.Checked, chkActivateTopLeft.Checked, chkTrackWindowSize.Checked, chkTrackWindowsOpenLocation.Checked, samplingResolution, txtHookStop.Text);
+                GlobalHook.StartScreenRecordingHook(chkCaptureClicks.Checked, chkCaptureMouse.Checked, chkGroupMovesIntoSequences.Checked, chkCaptureKeyboard.Checked, chkCaptureWindowEvents.Checked, chkActivateTopLeft.Checked, chkTrackWindowSize.Checked, chkTrackWindowsOpenLocation.Checked, samplingResolution, txtHookStop.Text,samplingTolerance);
                 lblRecording.Text = "Press '" + txtHookStop.Text + "' key to stop recording!";
                // WindowHook.StartHook();
 

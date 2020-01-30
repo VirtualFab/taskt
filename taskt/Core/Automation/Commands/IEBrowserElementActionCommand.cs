@@ -121,40 +121,56 @@ namespace taskt.Core.Automation.Commands
         private Boolean InspectFrame(IHTMLElementCollection elementCollection, EnumerableRowCollection<DataRow> elementSearchProperties, object sender, SHDocVw.InternetExplorer browserInstance)
         {
             bool qualifyingElementFound = false;
-            foreach (IHTMLElement element in elementCollection) // browserInstance.Document.All)
+            for (int accurate = 0; accurate <= 1; accurate++)
             {
-                if (element.outerHTML != null)
+                foreach (IHTMLElement element in elementCollection) // browserInstance.Document.All)
                 {
-                    string outerHtml = element.outerHTML.ToLower().Trim();
-
-                    if (!outerHtml.StartsWith("<html") &&
-                        !outerHtml.StartsWith("<body") &&
-                        !outerHtml.StartsWith("<head") &&
-                        !outerHtml.StartsWith("<!doctype"))
+                    if (element.outerHTML != null)
                     {
-                        qualifyingElementFound = FindQualifyingElement(elementSearchProperties, element);
-                        if (qualifyingElementFound)
+                        string outerHtml = element.outerHTML.ToLower().Trim();
+                        if (!outerHtml.StartsWith("<html") &&
+                            !outerHtml.StartsWith("<body") &&
+                            !outerHtml.StartsWith("<head") &&
+                            !outerHtml.StartsWith("<!doctype") &&
+                            !outerHtml.StartsWith("<script")
+                            )
                         {
-                            RunCommandActions(element, sender, browserInstance);
-                            lastElementCollectionFound = elementCollection;
-                            return (true);
-                            //break;
-                        }
-                        if (element.outerHTML != null && element.outerHTML.ToLower().Trim().StartsWith("<frame "))
-                        {
-                            string frameId = element.getAttribute("id");
-                            if (frameId == null)
+                            int childrenCount = 0;
+                            if (accurate == 0)
                             {
-                                frameId = element.getAttribute("name");
+                                foreach (IHTMLElement child in element.children)
+                                {
+                                    childrenCount++;
+                                    break;
+                                }
                             }
-                            if (frameId != null)
+                            if (childrenCount == 0) // 
                             {
-                                qualifyingElementFound = InspectFrame(browserInstance.Document.getElementById(frameId).contentDocument.all, elementSearchProperties, sender, browserInstance);
+                                qualifyingElementFound = FindQualifyingElement(elementSearchProperties, element);
+                                if (qualifyingElementFound)
+                                {
+                                    RunCommandActions(element, sender, browserInstance);
+                                    lastElementCollectionFound = elementCollection;
+                                    return (true);
+                                    //break;
+                                }
+                                if (element.outerHTML != null && element.outerHTML.ToLower().Trim().StartsWith("<frame "))
+                                {
+                                    string frameId = element.getAttribute("id");
+                                    if (frameId == null)
+                                    {
+                                        frameId = element.getAttribute("name");
+                                    }
+                                    if (frameId != null)
+                                    {
+                                        qualifyingElementFound = InspectFrame(browserInstance.Document.getElementById(frameId).contentDocument.all, elementSearchProperties, sender, browserInstance);
+                                    }
+                                }
+                                if (qualifyingElementFound)
+                                {
+                                    break;
+                                }
                             }
-                        }
-                        if (qualifyingElementFound)
-                        {
-                            break;
                         }
                     }
                 }
@@ -258,7 +274,8 @@ namespace taskt.Core.Automation.Commands
                     {
                         try
                         {
-                            if (element.style.cssText == searchPropertyValue) {
+                            if (element.style.cssText == searchPropertyValue)
+                            {
                                 seachCriteria.SetField<string>("Match Found", "True");
                             }
                             else
@@ -286,8 +303,15 @@ namespace taskt.Core.Automation.Commands
                         }
                         else
                         {
-                            string elementValue = (string)element.GetType().GetProperty(searchPropertyName).GetValue(element, null);
-                            //string elementValue = (string)element.getAttribute(searchPropertyName);
+                            string elementValue;
+                            try
+                            {
+                                elementValue = (string)element.GetType().GetProperty(searchPropertyName).GetValue(element, null);
+                            }
+                            catch (Exception ex)
+                            {
+                                elementValue = (string)element.getAttribute(searchPropertyName);
+                            }
 
                             if ((elementValue != null) && (searchPropertyValue.EndsWith("*%*") ? elementValue.Contains(searchPropertyValue.Substring(0,searchPropertyValue.Length - 3)) : elementValue == searchPropertyValue ))
                             {

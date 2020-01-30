@@ -34,6 +34,8 @@
             this.chkCaptureKeyboard = new System.Windows.Forms.CheckBox();
             this.lblRecording = new System.Windows.Forms.Label();
             this.pnlOptions = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtHookStop = new System.Windows.Forms.TextBox();
             this.chkTrackWindowsOpenLocation = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -47,8 +49,8 @@
             this.chkGroupIntoSequence = new System.Windows.Forms.CheckBox();
             this.chkCaptureClicks = new System.Windows.Forms.CheckBox();
             this.uiBtnRecord = new taskt.UI.CustomControls.UIPictureButton();
-            this.txtHookStop = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtHookTolerance = new System.Windows.Forms.TextBox();
             this.pnlOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.uiBtnRecord)).BeginInit();
             this.SuspendLayout();
@@ -113,6 +115,8 @@
             // pnlOptions
             // 
             this.pnlOptions.BackColor = System.Drawing.Color.Transparent;
+            this.pnlOptions.Controls.Add(this.label7);
+            this.pnlOptions.Controls.Add(this.txtHookTolerance);
             this.pnlOptions.Controls.Add(this.label6);
             this.pnlOptions.Controls.Add(this.txtHookStop);
             this.pnlOptions.Controls.Add(this.chkTrackWindowsOpenLocation);
@@ -134,6 +138,26 @@
             this.pnlOptions.Name = "pnlOptions";
             this.pnlOptions.Size = new System.Drawing.Size(506, 348);
             this.pnlOptions.TabIndex = 7;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.ForeColor = System.Drawing.Color.AliceBlue;
+            this.label6.Location = new System.Drawing.Point(10, 169);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(114, 13);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Stop Capture HotKey";
+            // 
+            // txtHookStop
+            // 
+            this.txtHookStop.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtHookStop.Location = new System.Drawing.Point(160, 166);
+            this.txtHookStop.Name = "txtHookStop";
+            this.txtHookStop.Size = new System.Drawing.Size(52, 22);
+            this.txtHookStop.TabIndex = 17;
+            this.txtHookStop.Text = "F2";
             // 
             // chkTrackWindowsOpenLocation
             // 
@@ -240,7 +264,7 @@
             this.txtHookResolution.Name = "txtHookResolution";
             this.txtHookResolution.Size = new System.Drawing.Size(52, 22);
             this.txtHookResolution.TabIndex = 9;
-            this.txtHookResolution.Text = "0";
+            this.txtHookResolution.Text = "100";
             // 
             // chkCaptureWindowEvents
             // 
@@ -298,27 +322,28 @@
             this.uiBtnRecord.Size = new System.Drawing.Size(48, 48);
             this.uiBtnRecord.TabIndex = 8;
             this.uiBtnRecord.TabStop = false;
+            this.uiBtnRecord.Text = "Start";
             this.uiBtnRecord.Click += new System.EventHandler(this.uiBtnRecord_Click);
             // 
-            // txtHookStop
+            // label7
             // 
-            this.txtHookStop.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtHookStop.Location = new System.Drawing.Point(160, 166);
-            this.txtHookStop.Name = "txtHookStop";
-            this.txtHookStop.Size = new System.Drawing.Size(52, 22);
-            this.txtHookStop.TabIndex = 17;
-            this.txtHookStop.Text = "F2";
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.Color.AliceBlue;
+            this.label7.Location = new System.Drawing.Point(218, 141);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(166, 13);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "Mouse Move Tolerance (points)";
             // 
-            // label6
+            // txtHookTolerance
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.ForeColor = System.Drawing.Color.AliceBlue;
-            this.label6.Location = new System.Drawing.Point(10, 169);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(114, 13);
-            this.label6.TabIndex = 18;
-            this.label6.Text = "Stop Capture HotKey";
+            this.txtHookTolerance.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtHookTolerance.Location = new System.Drawing.Point(390, 138);
+            this.txtHookTolerance.Name = "txtHookTolerance";
+            this.txtHookTolerance.Size = new System.Drawing.Size(52, 22);
+            this.txtHookTolerance.TabIndex = 20;
+            this.txtHookTolerance.Text = "100";
             // 
             // frmSequenceRecorder
             // 
@@ -362,5 +387,7 @@
         private System.Windows.Forms.CheckBox chkTrackWindowsOpenLocation;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtHookStop;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtHookTolerance;
     }
 }

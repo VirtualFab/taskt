@@ -176,7 +176,7 @@ namespace taskt.Core.Automation.Commands
 
 
 
-               
+
                 conditionList.Add(propCondition);
             }
 
@@ -197,6 +197,9 @@ namespace taskt.Core.Automation.Commands
 
             //if window was not found
             if (windowElement == null)
+                //let's retry with a slower but more accurate method
+                windowElement = AutomationElement.RootElement.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, variableWindowName));
+            if (windowElement == null)
                 throw new Exception("Window named '" + variableWindowName + "' was not found!");
 
             //find required handle based on specified conditions
@@ -212,12 +215,12 @@ namespace taskt.Core.Automation.Commands
             //create variable window name
             var variableWindowName = v_WindowName.ConvertToUserVariable(sender);
 
-            if (variableWindowName == "Current Window")
+            if (true) //variableWindowName == "Current Window")
             {
                 variableWindowName = User32Functions.GetActiveWindowTitle();
             }
 
-            var requiredHandle =  SearchForGUIElement(sender, variableWindowName);
+            var requiredHandle = SearchForGUIElement(sender, variableWindowName);
 
 
             //if element exists type
@@ -228,7 +231,7 @@ namespace taskt.Core.Automation.Commands
                                        where rw.Field<string>("Parameter Name") == "Apply To Variable"
                                        select rw.Field<string>("Parameter Value")).FirstOrDefault();
 
-                
+
                 //remove brackets from variable
                 applyToVariable = applyToVariable.Replace(engine.engineSettings.VariableStartMarker, "").Replace(engine.engineSettings.VariableEndMarker, "");
 
@@ -239,20 +242,20 @@ namespace taskt.Core.Automation.Commands
                 if (requiredHandle == null)
                 {
                     searchResult = "FALSE";
-  
+
                 }
                 else
                 {
                     searchResult = "TRUE";
                 }
 
-              //store data
+                //store data
                 searchResult.StoreInUserVariable(sender, applyToVariable);
 
             }
 
             //determine element click type
-           else if (v_AutomationType == "Click Element")
+            else if (v_AutomationType == "Click Element")
             {
 
                 //if handle was not found
@@ -306,7 +309,7 @@ namespace taskt.Core.Automation.Commands
                 var propertyName = (from rw in v_UIAActionParameters.AsEnumerable()
                                     where rw.Field<string>("Parameter Name") == "Get Value From"
                                     select rw.Field<string>("Parameter Value")).FirstOrDefault();
-               
+
                 //apply to variable
                 var applyToVariable = (from rw in v_UIAActionParameters.AsEnumerable()
                                        where rw.Field<string>("Parameter Name") == "Apply To Variable"
@@ -385,7 +388,7 @@ namespace taskt.Core.Automation.Commands
             CommandItemControl helperControl = new CommandItemControl();
             helperControl.Padding = new Padding(10, 0, 0, 0);
             helperControl.ForeColor = Color.AliceBlue;
-            helperControl.Font = new Font("Segoe UI Semilight", 10);         
+            helperControl.Font = new Font("Segoe UI Semilight", 10);
             helperControl.CommandImage = UI.Images.GetUIImage("ClipboardGetTextCommand");
             helperControl.CommandDisplay = "Element Recorder";
             helperControl.Click += ShowRecorder;
@@ -437,7 +440,7 @@ namespace taskt.Core.Automation.Commands
                 this.v_UIASearchParameters.ImportRow(rw);
             }
 
-           
+
             SearchParametersGridViewHelper.DataSource = this.v_UIASearchParameters;
             SearchParametersGridViewHelper.Refresh();
 
@@ -445,7 +448,7 @@ namespace taskt.Core.Automation.Commands
 
         public void UIAType_SelectionChangeCommitted(object sender, EventArgs e)
         {
-  
+
             ComboBox selectedAction = AutomationTypeControl;
 
             if (selectedAction == null)
@@ -461,7 +464,7 @@ namespace taskt.Core.Automation.Commands
                 actionParameters.Rows.Clear();
             }
 
-  
+
             switch (selectedAction.SelectedItem)
             {
                 case "Click Element":
@@ -553,7 +556,7 @@ namespace taskt.Core.Automation.Commands
 
                 return base.GetDisplayValue() + " [" + clickType + " element in window '" + v_WindowName + "']";
             }
-            else if(v_AutomationType == "Check If Element Exists")
+            else if (v_AutomationType == "Check If Element Exists")
             {
 
                 //apply to variable

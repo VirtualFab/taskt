@@ -51,7 +51,7 @@ namespace taskt.Core.Automation.User32
 
                 foreach (SHDocVw.InternetExplorer window in shellWindows)
                 {
-                    
+
                     if (window.LocationName.Contains(windowLocationName))
                     {
                         return new IntPtr(window.HWND);
@@ -88,7 +88,7 @@ namespace taskt.Core.Automation.User32
                 return hWnd;
             }
 
-         
+
         }
 
         public static List<IntPtr> FindTargetWindows(string windowName)
@@ -441,6 +441,8 @@ namespace taskt.Core.Automation.User32
             private static bool trackActivatedWindowSizes;
             private static bool trackWindowOpenLocations;
             private static int msResolution;
+            private static int msTolerance;
+            private static int msLastX, msLastY;
             public static string stopHookKey;
             private static Stopwatch lastMouseMove;
 
@@ -460,7 +462,7 @@ namespace taskt.Core.Automation.User32
                 _mouseHookID = SetMouseHook(_mouseLeftUpProc);
             }
 
-            public static void StartScreenRecordingHook(bool captureClick, bool captureMouse, bool groupMouseMoves, bool captureKeyboard, bool captureWindow, bool activateTopLeft, bool trackActivatedWindowSize, bool trackWindowsOpenLocation, int eventResolution, string stopHookHotKey)
+            public static void StartScreenRecordingHook(bool captureClick, bool captureMouse, bool groupMouseMoves, bool captureKeyboard, bool captureWindow, bool activateTopLeft, bool trackActivatedWindowSize, bool trackWindowsOpenLocation, int eventResolution, string stopHookHotKey, int eventTolerance)
             {
                 //create new list for commands generated
                 generatedCommands = new List<ScriptCommand>();
@@ -475,6 +477,7 @@ namespace taskt.Core.Automation.User32
                 trackActivatedWindowSizes = trackActivatedWindowSize;
                 trackWindowOpenLocations = trackWindowsOpenLocation;
                 msResolution = eventResolution;
+                msTolerance = eventTolerance;
                 stopHookKey = stopHookHotKey;
                 //start hook
                 _mouseHookID = SetMouseHook(_mouseProc);
@@ -484,9 +487,9 @@ namespace taskt.Core.Automation.User32
                 if (performWindowCapture)
                 {
                     _WinEventHookHandler = new SystemEventHandler(BuildWindowCommand);
-                    _WinEventHook = SetWinEventHook(SystemEvents.EVENT_MIN, SystemEvents.EVENT_MAX,IntPtr.Zero, _WinEventHookHandler, 0, 0, 0);
+                    _WinEventHook = SetWinEventHook(SystemEvents.EVENT_MIN, SystemEvents.EVENT_MAX, IntPtr.Zero, _WinEventHookHandler, 0, 0, 0);
                 }
-              
+
 
                 //start stopwatch for timing all event occurences
                 sw = new Stopwatch();
@@ -508,7 +511,7 @@ namespace taskt.Core.Automation.User32
                 {
                     UnhookWinEvent(_WinEventHook);
                 }
-               
+
                 //BuildCommentCommand();
 
                 HookStopped(null, new EventArgs());
@@ -518,7 +521,7 @@ namespace taskt.Core.Automation.User32
 
             //mouse and keyboard hook event triggers
             private static IntPtr KeyboardHookEvent(int nCode, IntPtr wParam, IntPtr lParam)
-           {
+            {
 
                 if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
 
@@ -715,6 +718,7 @@ namespace taskt.Core.Automation.User32
             private static void BuildMouseCommand(IntPtr lParam, MouseMessages mouseMessage)
             {
 
+                MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                 string mouseEventClickType = string.Empty;
                 switch (mouseMessage)
                 {
@@ -727,18 +731,20 @@ namespace taskt.Core.Automation.User32
                     case MouseMessages.WM_MOUSEMOVE:
                         mouseEventClickType = "None";
 
-                       
 
-                        if (lastMouseMove.ElapsedMilliseconds >= msResolution)
+
+                        if (lastMouseMove.ElapsedMilliseconds >= msResolution && Math.Abs(hookStruct.pt.x-msLastX)> msTolerance && Math.Abs(hookStruct.pt.y-msLastY)>msTolerance)
                         {
                             lastMouseMove.Restart();
+                            msLastX = hookStruct.pt.x;
+                            msLastY = hookStruct.pt.y;
                         }
                         else
                         {
                             return;
                         }
 
-         
+
                         break;
                     case MouseMessages.WM_RBUTTONDOWN:
                         mouseEventClickType = "Right Down";
@@ -755,7 +761,7 @@ namespace taskt.Core.Automation.User32
                 //    return;
 
 
-                   
+
                 //return if we do not want to capture mouse moves
                 if ((!performMouseMoveCapture) && (mouseEventClickType == "None"))
                 {
@@ -773,9 +779,8 @@ namespace taskt.Core.Automation.User32
 
 
                 //define new mouse command
-                MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
 
-               
+
 
 
                 var mouseMove = new Core.Automation.Commands.SendMouseMoveCommand
@@ -783,7 +788,7 @@ namespace taskt.Core.Automation.User32
                     v_XMousePosition = hookStruct.pt.x.ToString(),
                     v_YMousePosition = hookStruct.pt.y.ToString(),
                     v_MouseClick = mouseEventClickType
-            };
+                };
 
                 if (mouseEventClickType != "None")
                 {
@@ -835,14 +840,14 @@ namespace taskt.Core.Automation.User32
                     return;
                 }
 
-           
+
 
                 if (length > 0)
                 {
                     //wait additional for window to initialize
                     //System.Threading.Thread.Sleep(250);
                     windowName = _Buffer.ToString();
-                 
+
                     Automation.Commands.ActivateWindowCommand activateWindowCommand = new ActivateWindowCommand
                     {
                         v_WindowName = windowName,
@@ -869,7 +874,7 @@ namespace taskt.Core.Automation.User32
                         generatedCommands.Add(moveWindowCommand);
 
                     }
-                   else if (activateWindowTopLeft)
+                    else if (activateWindowTopLeft)
                     {
                         //generate command to set window position
                         Automation.Commands.MoveWindowCommand moveWindowCommand = new MoveWindowCommand
@@ -905,7 +910,7 @@ namespace taskt.Core.Automation.User32
                             v_Comment = "Generated by Screen Recorder @ " + DateTime.Now.ToString()
 
                         };
-                        
+
 
                         //add to list
                         generatedCommands.Add(reszWindowCommand);
@@ -1007,7 +1012,7 @@ namespace taskt.Core.Automation.User32
             static extern IntPtr ChildWindowFromPoint(IntPtr hWndParent, POINT Point);
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            public static extern int ToUnicode(uint virtualKeyCode,uint scanCode, byte[] keyboardState, StringBuilder receivingBuffer, int bufferSize, uint flags);
+            public static extern int ToUnicode(uint virtualKeyCode, uint scanCode, byte[] keyboardState, StringBuilder receivingBuffer, int bufferSize, uint flags);
 
 
             //enums and structs
@@ -1102,7 +1107,7 @@ namespace taskt.Core.Automation.User32
 
         }
 
-      
+
     }
     public class WindowHandleInfo
     {

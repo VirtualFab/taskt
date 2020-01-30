@@ -33,7 +33,7 @@ namespace taskt.Core.Automation.Commands
 
         public override string GetDisplayValue()
         {
-            return "// Comment: " + this.v_Comment;
+            return "// " + this.v_Comment;
         }
     }
 }
