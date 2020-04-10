@@ -220,9 +220,18 @@ namespace taskt.Core.Automation.Commands
                                            where rw.Field<string>("Parameter Name") == "Clear Element Before Setting Text"
                                            select rw.Field<string>("Parameter Value")).FirstOrDefault();
 
+                    string bypassValidation = (from rw in v_WebActionParameterTable.AsEnumerable()
+                                           where rw.Field<string>("Parameter Name") == "Bypass Variable Validation"
+                                           select rw.Field<string>("Parameter Value")).FirstOrDefault();
+
                     if (clearElement == null)
                     {
                         clearElement = "No";
+                    }
+
+                    if (bypassValidation == null)
+                    {
+                        bypassValidation = "No";
                     }
 
                     if (clearElement.ToLower() == "yes") 
@@ -230,6 +239,11 @@ namespace taskt.Core.Automation.Commands
                         element.Clear();
                     }
 
+                    if (bypassValidation.ToLower() == "yes")
+                    {
+                        element.SendKeys(textToSet);
+                        break;
+                    }
 
                     string[] potentialKeyPresses = textToSet.Split('{', '}');
 
@@ -509,18 +523,26 @@ namespace taskt.Core.Automation.Commands
                     {
                         actionParameters.Rows.Add("Text To Set");
                         actionParameters.Rows.Add("Clear Element Before Setting Text");
+                        actionParameters.Rows.Add("Bypass Variable Validation");
                     }
 
                     DataGridViewComboBoxCell comparisonComboBox = new DataGridViewComboBoxCell();
+                    DataGridViewComboBoxCell comparisonComboBox2 = new DataGridViewComboBoxCell();
+
                     comparisonComboBox.Items.Add("Yes");
                     comparisonComboBox.Items.Add("No");
+
+                    comparisonComboBox2.Items.Add("Yes");
+                    comparisonComboBox2.Items.Add("No");
 
                     //assign cell as a combobox
                     if (sender != null)
                     {
                         ElementsGridViewHelper.Rows[1].Cells[1].Value = "No";
+                        ElementsGridViewHelper.Rows[2].Cells[1].Value = "No";
                     }
                     ElementsGridViewHelper.Rows[1].Cells[1] = comparisonComboBox;
+                    ElementsGridViewHelper.Rows[2].Cells[1] = comparisonComboBox2;
 
 
                     break;
