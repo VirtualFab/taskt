@@ -61,6 +61,12 @@ namespace taskt.Core.Automation.Commands
             string replacementText = v_replacementText.ConvertToUserVariable(sender);
             string replacementValue = v_replacementValue.ConvertToUserVariable(sender);
 
+
+            if (replacementValue == "[crLF]")
+            {
+                replacementValue = Environment.NewLine;
+            }
+            
             //perform replacement
             replacementVariable = replacementVariable.Replace(replacementText, replacementValue);
 
