@@ -64,9 +64,10 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Get Attribute")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Get Matching Elements")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Wait For Element To Exist")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Wait For Element To Be Enabled")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Switch to frame")]
         [Attributes.PropertyAttributes.InputSpecification("Select the appropriate corresponding action to take once the element has been located")]
-        [Attributes.PropertyAttributes.SampleUsage("Select from **Invoke Click**, **Left Click**, **Right Click**, **Middle Click**, **Double Left Click**, **Clear Element**, **Set Text**, **Get Text**, **Get Attribute**, **Wait For Element To Exist**")]
+        [Attributes.PropertyAttributes.SampleUsage("Select from **Invoke Click**, **Left Click**, **Right Click**, **Middle Click**, **Double Left Click**, **Clear Element**, **Set Text**, **Get Text**, **Get Attribute**, **Wait For Element To Exist**, **Wait For Element To Be Enabled**")]
         [Attributes.PropertyAttributes.Remarks("Selecting this field changes the parameters that will be required in the next step")]
         public string v_SeleniumElementAction { get; set; }
         [XmlElement]
@@ -168,6 +169,48 @@ namespace taskt.Core.Automation.Commands
                 if (element == null)
                 {
                     throw new Exception("Element Not Found");
+                }
+
+                return;
+            }
+            else if (v_SeleniumElementAction == "Wait For Element To Be Enabled") {
+                var timeoutText = (from rw in v_WebActionParameterTable.AsEnumerable()
+                                   where rw.Field<string>("Parameter Name") == "Timeout (Seconds)"
+                                   select rw.Field<string>("Parameter Value")).FirstOrDefault();
+
+                timeoutText = timeoutText.ConvertToUserVariable(sender);
+
+                int timeOut = Convert.ToInt32(timeoutText);
+
+                var timeToEnd = DateTime.Now.AddSeconds(timeOut);
+
+                while (timeToEnd >= DateTime.Now)
+                {
+                    try
+                    {
+                        element = FindElement(seleniumInstance, seleniumSearchParam);
+                    }
+                    catch (Exception)
+                    {
+                        engine.ReportProgress("Element Not Yet Found... " + (timeToEnd - DateTime.Now).Seconds + "s remain");
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                    if (element != null)
+                    {
+                        if (element.Enabled)
+                        {
+                            break;
+                        }
+                        else {
+                            engine.ReportProgress("Element Not Yet Enabled... " + (timeToEnd - DateTime.Now).Seconds + "s remain");
+                            System.Threading.Thread.Sleep(1000);
+                        }
+                    }
+                }
+
+                if (element == null)
+                {
+                    throw new Exception("Element Not Found Or Not Enabled Yet");
                 }
 
                 return;
@@ -572,6 +615,7 @@ namespace taskt.Core.Automation.Commands
                     break;
 
                 case "Wait For Element To Exist":
+                case "Wait For Element To Be Enabled":
                     foreach (var ctrl in ElementParameterControls)
                     {
                         ctrl.Show();
