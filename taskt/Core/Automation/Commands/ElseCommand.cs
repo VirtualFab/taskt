@@ -31,9 +31,9 @@ namespace taskt.Core.Automation.Commands
             return RenderedControls;
         }
 
-        public override string GetDisplayValue()
-        {
-            return "Else";
-        }
+        //public override string GetDisplayValue()
+        //{
+        //    return "Else";
+        //}
     }
 }
