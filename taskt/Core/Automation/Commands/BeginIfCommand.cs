@@ -29,6 +29,7 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Date Compare")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Variable Compare")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Variable Has Value")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Variable Has No Value")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Variable Is Numeric")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Window Name Exists")]
         [Attributes.PropertyAttributes.PropertyUISelectionOption("Active Window Name Is")]
@@ -275,6 +276,24 @@ namespace taskt.Core.Automation.Commands
                 var actualVariable = variableName.ConvertToUserVariable(sender).Trim();
 
                 if (!string.IsNullOrEmpty(actualVariable))
+                {
+                    ifResult = true;
+                }
+                else
+                {
+                    ifResult = false;
+                }
+
+            }
+            else if (v_IfActionType == "Variable Has No Value")
+            {
+                string variableName = ((from rw in v_IfActionParameterTable.AsEnumerable()
+                                        where rw.Field<string>("Parameter Name") == "Variable Name"
+                                        select rw.Field<string>("Parameter Value")).FirstOrDefault());
+
+                var actualVariable = variableName.ConvertToUserVariable(sender).Trim();
+
+                if (string.IsNullOrEmpty(actualVariable))
                 {
                     ifResult = true;
                 }
@@ -665,17 +684,8 @@ namespace taskt.Core.Automation.Commands
                     break;
 
                 case "Variable Has Value":
-      
-                    ifActionParameterBox.Visible = true;
-                    if (sender != null)
-                    {
-                        actionParameters.Rows.Add("Variable Name", "");
-                        ifActionParameterBox.DataSource = actionParameters;
-                    }
-
-                    break;
+                case "Variable Has No Value":
                 case "Variable Is Numeric":
-              
                     ifActionParameterBox.Visible = true;
                     if (sender != null)
                     {
@@ -684,20 +694,20 @@ namespace taskt.Core.Automation.Commands
                     }
 
                     break;
-                case "Error Occured":
-             
-                    ifActionParameterBox.Visible = true;
-                    if (sender != null)
-                    {
-                        actionParameters.Rows.Add("Line Number", "");
-                        ifActionParameterBox.DataSource = actionParameters;
-                    }
+                //case "Variable Is Numeric":
+              
+                //    ifActionParameterBox.Visible = true;
+                //    if (sender != null)
+                //    {
+                //        actionParameters.Rows.Add("Variable Name", "");
+                //        ifActionParameterBox.DataSource = actionParameters;
+                //    }
 
-                    break;
+                //    break;
+                case "Error Occured":
                 case "Error Did Not Occur":
 
                     ifActionParameterBox.Visible = true;
-
                     if (sender != null)
                     {
                         actionParameters.Rows.Add("Line Number", "");
@@ -705,6 +715,17 @@ namespace taskt.Core.Automation.Commands
                     }
 
                     break;
+                //case "Error Did Not Occur":
+
+                //    ifActionParameterBox.Visible = true;
+
+                //    if (sender != null)
+                //    {
+                //        actionParameters.Rows.Add("Line Number", "");
+                //        ifActionParameterBox.DataSource = actionParameters;
+                //    }
+
+                //    break;
                 case "Window Name Exists":
                 case "Active Window Name Is":
    
@@ -890,6 +911,12 @@ namespace taskt.Core.Automation.Commands
                                       select rw.Field<string>("Parameter Value")).FirstOrDefault());
 
                     return "If (Variable " + variableName + " Has Value)";
+                case "Variable Has No Value":
+                    string variable = ((from rw in v_IfActionParameterTable.AsEnumerable()
+                                            where rw.Field<string>("Parameter Name") == "Variable Name"
+                                            select rw.Field<string>("Parameter Value")).FirstOrDefault());
+
+                    return "If (Variable " + variable + " Has No Value)";
                 case "Variable Is Numeric":
                     string varName = ((from rw in v_IfActionParameterTable.AsEnumerable()
                                             where rw.Field<string>("Parameter Name") == "Variable Name"
