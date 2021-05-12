@@ -82,6 +82,16 @@ namespace taskt.Core.Automation.Commands
         [Attributes.PropertyAttributes.SampleUsage("**c:\\temp\\file.txt**")]
         [Attributes.PropertyAttributes.Remarks("")]
         public string v_SMTPAttachment { get; set; }
+
+        [XmlAttribute]
+        [Attributes.PropertyAttributes.PropertyDescription("Enable SSL")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("Yes")]
+        [Attributes.PropertyAttributes.PropertyUISelectionOption("No")]
+        [Attributes.PropertyAttributes.InputSpecification("Select if Enable SSL.")]
+        [Attributes.PropertyAttributes.SampleUsage("Select **YES** to enable or **No** to disable.")]
+        [Attributes.PropertyAttributes.Remarks("")]
+        public string v_SMTPEnableSSL { get; set; }
+
         public SMTPSendEmailCommand()
         {
             this.CommandName = "SMTPCommand";
@@ -102,12 +112,13 @@ namespace taskt.Core.Automation.Commands
             string varSMTPSubject = v_SMTPSubject.ConvertToUserVariable(sender);
             string varSMTPBody = v_SMTPBody.ConvertToUserVariable(sender);
             string varSMTPFilePath = v_SMTPAttachment.ConvertToUserVariable(sender);
+            bool varEnableSSL = v_SMTPEnableSSL != "No";
 
-            var client = new SmtpClient(varSMTPHost, int.Parse(varSMTPPort))
+                var client = new SmtpClient(varSMTPHost, int.Parse(varSMTPPort))
             {
                 Credentials = new System.Net.NetworkCredential(varSMTPUserName, varSMTPPassword),
-                EnableSsl = true
-            };
+                EnableSsl = varEnableSSL
+                };
 
             var message = new MailMessage(varSMTPFromEmail, varSMTPToEmail);
             message.Subject = varSMTPSubject;
@@ -134,6 +145,7 @@ namespace taskt.Core.Automation.Commands
             RenderedControls.AddRange(CommandControls.CreateDefaultInputGroupFor("v_SMTPSubject", this, editor));
             RenderedControls.AddRange(CommandControls.CreateDefaultInputGroupFor("v_SMTPBody", this, editor));
             RenderedControls.AddRange(CommandControls.CreateDefaultInputGroupFor("v_SMTPAttachment", this, editor));
+            RenderedControls.AddRange(CommandControls.CreateDefaultDropdownGroupFor("v_SMTPEnableSSL", this,editor));
 
             return RenderedControls;
 
